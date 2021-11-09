@@ -47,3 +47,38 @@ func TestSaveMessage(t *testing.T) {
 		t.Error("result page without key")
 	}
 }
+
+func TestReadMessage(t *testing.T) {
+	testMessage := "helloMessage"
+	key := keyBuilder.Get()
+	keeper.Set(key, testMessage)
+
+	request, _ := http.NewRequest("GET", fmt.Sprintf("/%s", key), nil)
+	w := httptest.NewRecorder()
+	handleTestRequest(w, request)
+	if w.Code != 200 {
+		t.Error("read message is not 200")
+	}
+
+	result := w.Result()
+	defer result.Body.Close()
+	data, _ := ioutil.ReadAll(result.Body)
+	if !strings.Contains(string(data), testMessage) {
+		t.Error("result page without key")
+	}
+
+	_, err := keeper.Get(key)
+	if err == nil {
+		t.Error("keeper value must be empty")
+	}
+}
+
+func TestReadMessageNotFound(t *testing.T) {
+	key := keyBuilder.Get()
+	request, _ := http.NewRequest("GET", fmt.Sprintf("/%s", key), nil)
+	w := httptest.NewRecorder()
+	handleTestRequest(w, request)
+	if w.Code != 404 {
+		t.Error("empty message must be 404")
+	}
+}

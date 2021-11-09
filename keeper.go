@@ -2,6 +2,8 @@ package main
 
 import "errors"
 
+const NotFoundError = "not_found"
+
 type Keeper interface {
 	Get(key string) (string, error)
 	Set(key string, message string) error
@@ -15,7 +17,7 @@ type DummyKeeper struct {
 func (k DummyKeeper) Get(key string) (string, error) {
 	value, ok := k.mem[key]
 	if !ok {
-		return "", errors.New("message not found")
+		return "", errors.New(NotFoundError)
 	}
 	return value, nil
 }
