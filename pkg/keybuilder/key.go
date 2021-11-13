@@ -24,6 +24,6 @@ func (k UUIDKeyBuilder) Get() (string, error) {
 	return uuid.String(), nil
 }
 
-func GetKeyBuilder() KeyBuilder {
+func GetDummyKeyBuilder() KeyBuilder {
 	return DummyKeyBuilder{}
 }
