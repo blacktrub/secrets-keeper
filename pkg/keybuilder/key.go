@@ -1,4 +1,4 @@
-package main
+package keybuilder
 
 import "github.com/google/uuid"
 
@@ -24,6 +24,6 @@ func (k UUIDKeyBuilder) Get() (string, error) {
 	return uuid.String(), nil
 }
 
-func getKeyBuilder() KeyBuilder {
+func GetKeyBuilder() KeyBuilder {
 	return DummyKeyBuilder{}
 }

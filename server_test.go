@@ -5,15 +5,16 @@ import (
 	"io/ioutil"
 	"net/http"
 	"net/http/httptest"
+	"secrets-keeper/pkg/keybuilder"
+	"secrets-keeper/pkg/storage"
 	"strings"
 	"testing"
-	"secrets-keeper/pkg/storage"
 )
 
 var dummyKeeper = keeper.GetDummyKeeper()
 
 func handleTestRequest(w *httptest.ResponseRecorder, r *http.Request) {
-	keyBuilder := getKeyBuilder()
+	keyBuilder := keybuilder.GetKeyBuilder()
 	router := getRouter(keyBuilder, dummyKeeper)
 	router.ServeHTTP(w, r)
 }
@@ -38,7 +39,7 @@ func TestSaveMessage(t *testing.T) {
 		t.Error("save is not 200")
 	}
 
-	keyBuilder := getKeyBuilder()
+	keyBuilder := keybuilder.GetKeyBuilder()
 	key, _ := keyBuilder.Get()
 	savedMessage, _ := dummyKeeper.Get(key)
 	if savedMessage != testMessage {
@@ -55,7 +56,7 @@ func TestSaveMessage(t *testing.T) {
 
 func TestReadMessage(t *testing.T) {
 	testMessage := "helloMessage"
-	keyBuilder := getKeyBuilder()
+	keyBuilder := keybuilder.GetKeyBuilder()
 	key, _ := keyBuilder.Get()
 	dummyKeeper.Set(key, testMessage)
 	request, _ := http.NewRequest("GET", fmt.Sprintf("/%s", key), nil)
@@ -79,7 +80,7 @@ func TestReadMessage(t *testing.T) {
 }
 
 func TestReadMessageNotFound(t *testing.T) {
-	keyBuilder := getKeyBuilder()
+	keyBuilder := keybuilder.GetKeyBuilder()
 	key, _ := keyBuilder.Get()
 	request, _ := http.NewRequest("GET", fmt.Sprintf("/%s", key), nil)
 	w := httptest.NewRecorder()

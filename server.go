@@ -5,6 +5,7 @@ import (
 	"net/http"
 
 	"github.com/gin-gonic/gin"
+	"secrets-keeper/pkg/keybuilder"
 	"secrets-keeper/pkg/storage"
 )
 
@@ -16,7 +17,7 @@ func indexView(c *gin.Context) {
 	c.HTML(http.StatusOK, "index.html", nil)
 }
 
-func saveMessageView(c *gin.Context, keyBuilder KeyBuilder, keeper keeper.Keeper) {
+func saveMessageView(c *gin.Context, keyBuilder keybuilder.KeyBuilder, keeper keeper.Keeper) {
 	message := c.PostForm("message")
 	key, err := keyBuilder.Get()
 	if err != nil {
@@ -32,7 +33,7 @@ func saveMessageView(c *gin.Context, keyBuilder KeyBuilder, keeper keeper.Keeper
 	c.HTML(http.StatusOK, "key.html", gin.H{"key": fmt.Sprintf("http://%s/%s", c.Request.Host, key)})
 }
 
-func readMessageView(c *gin.Context, keyBuilder KeyBuilder, keeper keeper.Keeper) {
+func readMessageView(c *gin.Context, keyBuilder keybuilder.KeyBuilder, keeper keeper.Keeper) {
 	key := c.Param("key")
 	msg, err := keeper.Get(key)
 	if err != nil {
@@ -53,13 +54,13 @@ func readMessageView(c *gin.Context, keyBuilder KeyBuilder, keeper keeper.Keeper
 	c.HTML(http.StatusOK, "message.html", gin.H{"message": msg})
 }
 
-func buildHandler(fn func(c *gin.Context, keyBuilder KeyBuilder, keeper keeper.Keeper), keyBuilder KeyBuilder, keeper keeper.Keeper) gin.HandlerFunc {
+func buildHandler(fn func(c *gin.Context, keyBuilder keybuilder.KeyBuilder, keeper keeper.Keeper), keyBuilder keybuilder.KeyBuilder, keeper keeper.Keeper) gin.HandlerFunc {
 	return func(c *gin.Context) {
 		fn(c, keyBuilder, keeper)
 	}
 }
 
-func getRouter(keyBuilder KeyBuilder, keeper keeper.Keeper) *gin.Engine {
+func getRouter(keyBuilder keybuilder.KeyBuilder, keeper keeper.Keeper) *gin.Engine {
 	router := gin.Default()
 	router.LoadHTMLFiles(
 		"templates/index.html",
@@ -75,7 +76,7 @@ func getRouter(keyBuilder KeyBuilder, keeper keeper.Keeper) *gin.Engine {
 }
 
 func main() {
-	keyBuilder := UUIDKeyBuilder{}
+	keyBuilder := keybuilder.UUIDKeyBuilder{}
 	keeper := keeper.GetRedisKeeper()
 	router := getRouter(keyBuilder, keeper)
 	router.Run("localhost:8080")
