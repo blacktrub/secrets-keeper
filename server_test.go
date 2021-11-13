@@ -7,13 +7,14 @@ import (
 	"net/http/httptest"
 	"strings"
 	"testing"
+	"secrets-keeper/pkg/storage"
 )
 
-var keeper = getDummyKeeper()
+var dummyKeeper = keeper.GetDummyKeeper()
 
 func handleTestRequest(w *httptest.ResponseRecorder, r *http.Request) {
 	keyBuilder := getKeyBuilder()
-	router := getRouter(keyBuilder, keeper)
+	router := getRouter(keyBuilder, dummyKeeper)
 	router.ServeHTTP(w, r)
 }
 
@@ -39,7 +40,7 @@ func TestSaveMessage(t *testing.T) {
 
 	keyBuilder := getKeyBuilder()
 	key, _ := keyBuilder.Get()
-	savedMessage, _ := keeper.Get(key)
+	savedMessage, _ := dummyKeeper.Get(key)
 	if savedMessage != testMessage {
 		t.Error("message was not saved")
 	}
@@ -56,7 +57,7 @@ func TestReadMessage(t *testing.T) {
 	testMessage := "helloMessage"
 	keyBuilder := getKeyBuilder()
 	key, _ := keyBuilder.Get()
-	keeper.Set(key, testMessage)
+	dummyKeeper.Set(key, testMessage)
 	request, _ := http.NewRequest("GET", fmt.Sprintf("/%s", key), nil)
 	w := httptest.NewRecorder()
 	handleTestRequest(w, request)
@@ -71,7 +72,7 @@ func TestReadMessage(t *testing.T) {
 		t.Error("result page without key")
 	}
 
-	_, err := keeper.Get(key)
+	_, err := dummyKeeper.Get(key)
 	if err == nil {
 		t.Error("keeper value must be empty")
 	}

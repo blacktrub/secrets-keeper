@@ -1,4 +1,4 @@
-package main
+package keeper
 
 import (
 	"context"
@@ -14,11 +14,11 @@ type Keeper interface {
 	Clean(key string) error
 }
 
-func getDummyKeeper() Keeper {
+func GetDummyKeeper() Keeper {
 	return DummyKeeper{make(map[string]string)}
 }
 
-func getRedisKeeper() Keeper {
+func GetRedisKeeper() Keeper {
 	return RedisKeeper{*redis.NewClient(&redis.Options{
 		Addr:     "localhost:6379",
 		Password: "",
