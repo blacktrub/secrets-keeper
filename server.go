@@ -4,9 +4,10 @@ import (
 	"fmt"
 	"net/http"
 
-	"github.com/gin-gonic/gin"
 	"secrets-keeper/pkg/keybuilder"
 	"secrets-keeper/pkg/storage"
+
+	"github.com/gin-gonic/gin"
 )
 
 func writeInternalError(c *gin.Context) {
@@ -44,13 +45,6 @@ func readMessageView(c *gin.Context, keyBuilder keybuilder.KeyBuilder, keeper ke
 		writeInternalError(c)
 		return
 	}
-
-	err = keeper.Clean(key)
-	if err != nil {
-		writeInternalError(c)
-		return
-	}
-
 	c.HTML(http.StatusOK, "message.html", gin.H{"message": msg})
 }
 

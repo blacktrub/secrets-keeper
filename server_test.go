@@ -5,10 +5,12 @@ import (
 	"io/ioutil"
 	"net/http"
 	"net/http/httptest"
+	"secrets-keeper/pkg/keybuilder"
+	"secrets-keeper/pkg/storage"
 	"strings"
 	"testing"
-	"secrets-keeper/pkg/storage"
-	"secrets-keeper/pkg/keybuilder"
+
+	"github.com/gin-gonic/gin"
 )
 
 var dummyKeeper = keeper.GetDummyKeeper()
@@ -87,5 +89,42 @@ func TestReadMessageNotFound(t *testing.T) {
 	handleTestRequest(w, request)
 	if w.Code != 404 {
 		t.Error("empty message must be 404")
+	}
+}
+
+func TestOneReader(t *testing.T) {
+	dummyKeeper := keeper.GetDummyKeeper()
+	testMessage := "helloMessage"
+	keyBuilder := keybuilder.GetDummyKeyBuilder()
+	key, _ := keyBuilder.Get()
+	dummyKeeper.Set(key, testMessage)
+
+	router := getRouter(keyBuilder, dummyKeeper)
+	resultChannel := make(chan int, 2)
+
+	go func(key string, c chan int, router gin.Engine) {
+		request, _ := http.NewRequest("GET", fmt.Sprintf("/%s", key), nil)
+		w := httptest.NewRecorder()
+		router.ServeHTTP(w, request)
+		resultChannel <- w.Code
+	}(key, resultChannel, *router)
+
+	go func(key string, c chan int, router gin.Engine) {
+		request, _ := http.NewRequest("GET", fmt.Sprintf("/%s", key), nil)
+		w := httptest.NewRecorder()
+		router.ServeHTTP(w, request)
+		resultChannel <- w.Code
+	}(key, resultChannel, *router)
+
+	firstCode := <-resultChannel
+	secondCode := <-resultChannel
+
+	fmt.Println(firstCode, secondCode)
+	if firstCode != 200 {
+		t.Error("first must be 200")
+	}
+
+	if secondCode != 404 {
+		t.Error("first must be 404")
 	}
 }

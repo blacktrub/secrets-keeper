@@ -1,16 +1,23 @@
 package keeper
 
-import "errors"
+import (
+	"errors"
+	"sync"
+)
 
 type DummyKeeper struct {
 	mem map[string]string
+	mu *sync.Mutex
 }
 
 func (k DummyKeeper) Get(key string) (string, error) {
+    k.mu.Lock()
+    defer k.mu.Unlock()
 	value, ok := k.mem[key]
 	if !ok {
 		return "", errors.New(NotFoundError)
 	}
+	k.Clean(key)
 	return value, nil
 }
 

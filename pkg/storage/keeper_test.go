@@ -1,9 +1,10 @@
 package keeper
 
 import "testing"
+import "sync"
 
 func TestDummyKeeperSet(t *testing.T) {
-	keeper := DummyKeeper{make(map[string]string)}
+    keeper := DummyKeeper{mem: make(map[string]string), mu: &sync.Mutex{}}
 	key := "foo"
 	value := "bar"
 	keeper.Set(key, value)
@@ -13,7 +14,7 @@ func TestDummyKeeperSet(t *testing.T) {
 }
 
 func TestDummyKeeperGet(t *testing.T) {
-	keeper := DummyKeeper{make(map[string]string)}
+    keeper := DummyKeeper{mem: make(map[string]string), mu: &sync.Mutex{}}
 	key := "foo"
 	value := "bar"
 	keeper.mem[key] = value
@@ -24,7 +25,7 @@ func TestDummyKeeperGet(t *testing.T) {
 }
 
 func TestDummyKeeperClean(t *testing.T) {
-	keeper := DummyKeeper{make(map[string]string)}
+    keeper := DummyKeeper{mem: make(map[string]string), mu: &sync.Mutex{}}
 	key := "foo"
 	value := "bar"
 	keeper.mem[key] = value

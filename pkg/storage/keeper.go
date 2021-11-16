@@ -2,6 +2,7 @@ package keeper
 
 import (
 	"context"
+	"sync"
 
 	"github.com/go-redis/redis/v8"
 )
@@ -15,7 +16,7 @@ type Keeper interface {
 }
 
 func GetDummyKeeper() Keeper {
-	return DummyKeeper{make(map[string]string)}
+    return DummyKeeper{mem: make(map[string]string), mu: &sync.Mutex{}}
 }
 
 func GetRedisKeeper() Keeper {
