@@ -12,7 +12,6 @@ const NotFoundError = "not_found"
 type Keeper interface {
 	Get(key string) (string, error)
 	Set(key string, message string) error
-	Clean(key string) error
 }
 
 func GetDummyKeeper() Keeper {

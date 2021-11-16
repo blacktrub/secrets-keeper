@@ -15,7 +15,7 @@ type RedisKeeper struct {
 }
 
 func (k RedisKeeper) Get(key string) (string, error) {
-	val, err := k.cn.Get(k.ctx, key).Result()
+	val, err := k.cn.GetDel(k.ctx, key).Result()
 	if err == redis.Nil {
 		return "", errors.New(NotFoundError)
 	}
@@ -26,6 +26,3 @@ func (k RedisKeeper) Set(key string, message string) error {
 	return k.cn.Set(k.ctx, key, message, TTL).Err()
 }
 
-func (k RedisKeeper) Clean(key string) error {
-	return k.cn.Del(k.ctx, key).Err()
-}
