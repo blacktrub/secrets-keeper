@@ -21,7 +21,7 @@ func (k DummyKeeper) Get(key string) (string, error) {
 	return value, nil
 }
 
-func (k DummyKeeper) Set(key string, message string) error {
+func (k DummyKeeper) Set(key string, message string, ttl int) error {
 	k.mem[key] = message
 	return nil
 }

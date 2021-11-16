@@ -60,7 +60,7 @@ func TestReadMessage(t *testing.T) {
 	testMessage := "helloMessage"
 	keyBuilder := keybuilder.GetDummyKeyBuilder()
 	key, _ := keyBuilder.Get()
-	dummyKeeper.Set(key, testMessage)
+	dummyKeeper.Set(key, testMessage, 0)
 	request, _ := http.NewRequest("GET", fmt.Sprintf("/%s", key), nil)
 	w := httptest.NewRecorder()
 	handleTestRequest(w, request)
@@ -97,7 +97,7 @@ func TestOneReader(t *testing.T) {
 	testMessage := "helloMessage"
 	keyBuilder := keybuilder.GetDummyKeyBuilder()
 	key, _ := keyBuilder.Get()
-	dummyKeeper.Set(key, testMessage)
+	dummyKeeper.Set(key, testMessage, 0)
 
 	router := getRouter(keyBuilder, dummyKeeper)
 	resultChannel := make(chan int, 2)
@@ -119,7 +119,6 @@ func TestOneReader(t *testing.T) {
 	firstCode := <-resultChannel
 	secondCode := <-resultChannel
 
-	fmt.Println(firstCode, secondCode)
 	if firstCode != 200 {
 		t.Error("first must be 200")
 	}

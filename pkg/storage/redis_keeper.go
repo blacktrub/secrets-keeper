@@ -3,6 +3,7 @@ package keeper
 import (
 	"context"
 	"errors"
+	"time"
 
 	"github.com/go-redis/redis/v8"
 )
@@ -22,7 +23,7 @@ func (k RedisKeeper) Get(key string) (string, error) {
 	return val, err
 }
 
-func (k RedisKeeper) Set(key string, message string) error {
-	return k.cn.Set(k.ctx, key, message, TTL).Err()
+func (k RedisKeeper) Set(key string, message string, ttl int) error {
+	return k.cn.Set(k.ctx, key, message, time.Duration(ttl)).Err()
 }
 

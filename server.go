@@ -3,6 +3,7 @@ package main
 import (
 	"fmt"
 	"net/http"
+	"strconv"
 
 	"secrets-keeper/pkg/keybuilder"
 	"secrets-keeper/pkg/storage"
@@ -20,13 +21,18 @@ func indexView(c *gin.Context) {
 
 func saveMessageView(c *gin.Context, keyBuilder keybuilder.KeyBuilder, keeper keeper.Keeper) {
 	message := c.PostForm("message")
+    ttl, err := strconv.Atoi(c.PostForm("ttl"))
+	if err != nil {
+	    ttl = 0
+	}
+
 	key, err := keyBuilder.Get()
 	if err != nil {
 		writeInternalError(c)
 		return
 	}
 
-	err = keeper.Set(key, message)
+	err = keeper.Set(key, message, ttl)
 	if err != nil {
 		writeInternalError(c)
 		return

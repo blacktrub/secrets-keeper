@@ -7,7 +7,7 @@ func TestDummyKeeperSet(t *testing.T) {
     keeper := DummyKeeper{mem: make(map[string]string), mu: &sync.Mutex{}}
 	key := "foo"
 	value := "bar"
-	keeper.Set(key, value)
+	keeper.Set(key, value, 0)
 	if keeper.mem[key] != value {
 		t.Error("bad memory value")
 	}
