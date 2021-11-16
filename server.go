@@ -21,9 +21,9 @@ func indexView(c *gin.Context) {
 
 func saveMessageView(c *gin.Context, keyBuilder keybuilder.KeyBuilder, keeper keeper.Keeper) {
 	message := c.PostForm("message")
-    ttl, err := strconv.Atoi(c.PostForm("ttl"))
+	ttl, err := strconv.Atoi(c.PostForm("ttl"))
 	if err != nil {
-	    ttl = 0
+		ttl = 0
 	}
 
 	key, err := keyBuilder.Get()

@@ -119,11 +119,7 @@ func TestOneReader(t *testing.T) {
 	firstCode := <-resultChannel
 	secondCode := <-resultChannel
 
-	if firstCode != 200 {
-		t.Error("first must be 200")
-	}
-
-	if secondCode != 404 {
-		t.Error("first must be 404")
+	if firstCode+secondCode != (200 + 404) {
+		t.Error("one answer must be 404")
 	}
 }
