@@ -11,8 +11,19 @@ import (
 	"github.com/gin-gonic/gin"
 )
 
+var MESSAGE_MAX_LENGHT = 1024
+
+
+func validateMessageLenght(msg string) bool {
+    return len(msg) <= MESSAGE_MAX_LENGHT
+}
+
 func writeInternalError(c *gin.Context) {
 	c.HTML(http.StatusInternalServerError, "500.html", gin.H{})
+}
+
+func writeBadRequest(c *gin.Context, reason string) {
+    c.HTML(http.StatusBadRequest, "400.html", gin.H{"reason": reason})
 }
 
 func indexView(c *gin.Context) {
@@ -21,6 +32,11 @@ func indexView(c *gin.Context) {
 
 func saveMessageView(c *gin.Context, keyBuilder keybuilder.KeyBuilder, keeper keeper.Keeper) {
 	message := c.PostForm("message")
+	if !validateMessageLenght(message) {
+		writeBadRequest(c, "message")
+		return
+	}
+
 	ttl, err := strconv.Atoi(c.PostForm("ttl"))
 	if err != nil {
 		ttl = 0
@@ -67,6 +83,7 @@ func getRouter(keyBuilder keybuilder.KeyBuilder, keeper keeper.Keeper) *gin.Engi
 		"templates/key.html",
 		"templates/message.html",
 		"templates/404.html",
+		"templates/400.html",
 		"templates/500.html",
 	)
 	router.GET("/", indexView)
