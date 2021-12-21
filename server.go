@@ -12,10 +12,14 @@ import (
 )
 
 var MESSAGE_MAX_LENGHT = 1024
-
+var MAX_TTL = 86400
 
 func validateMessageLenght(msg string) bool {
-    return len(msg) <= MESSAGE_MAX_LENGHT
+	return len(msg) <= MESSAGE_MAX_LENGHT
+}
+
+func validateTTLSize(ttl int) bool {
+	return ttl <= MAX_TTL
 }
 
 func writeInternalError(c *gin.Context) {
@@ -23,7 +27,7 @@ func writeInternalError(c *gin.Context) {
 }
 
 func writeBadRequest(c *gin.Context, reason string) {
-    c.HTML(http.StatusBadRequest, "400.html", gin.H{"reason": reason})
+	c.HTML(http.StatusBadRequest, "400.html", gin.H{"reason": reason})
 }
 
 func indexView(c *gin.Context) {
@@ -40,6 +44,11 @@ func saveMessageView(c *gin.Context, keyBuilder keybuilder.KeyBuilder, keeper ke
 	ttl, err := strconv.Atoi(c.PostForm("ttl"))
 	if err != nil {
 		ttl = 0
+	}
+
+	if !validateTTLSize(ttl) {
+		writeBadRequest(c, "ttl")
+		return
 	}
 
 	key, err := keyBuilder.Get()

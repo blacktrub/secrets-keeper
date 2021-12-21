@@ -126,11 +126,24 @@ func TestOneReader(t *testing.T) {
 
 func TestMessageLengthValidation(t *testing.T) {
 	testMessage := ""
-    for i := 0; i < MESSAGE_MAX_LENGHT + 1; i++ {
-        testMessage += "a"
-    }
+	for i := 0; i < MESSAGE_MAX_LENGHT+1; i++ {
+		testMessage += "a"
+	}
 
 	postData := strings.NewReader(fmt.Sprintf("message=%s", testMessage))
+	request, _ := http.NewRequest("POST", "/", postData)
+	request.Header.Set("Content-Type", "application/x-www-form-urlencoded")
+	w := httptest.NewRecorder()
+	handleTestRequest(w, request)
+	if w.Code != 400 {
+		t.Error("Must be error, because message is too long, but received", w.Code)
+	}
+}
+
+func TestMaxTTLValidation(t *testing.T) {
+	testMessage := "foo"
+	ttl := 999999
+	postData := strings.NewReader(fmt.Sprintf("message=%s&ttl=%d", testMessage, ttl))
 	request, _ := http.NewRequest("POST", "/", postData)
 	request.Header.Set("Content-Type", "application/x-www-form-urlencoded")
 	w := httptest.NewRecorder()
