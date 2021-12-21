@@ -152,3 +152,19 @@ func TestMaxTTLValidation(t *testing.T) {
 		t.Error("Must be error, because message is too long, but received", w.Code)
 	}
 }
+
+func TestKeeperMustKeepWithEncyption(t *testing.T) {
+	testMessage := "foo"
+	postData := strings.NewReader(fmt.Sprintf("message=%s", testMessage))
+	request, _ := http.NewRequest("POST", "/", postData)
+	request.Header.Set("Content-Type", "application/x-www-form-urlencoded")
+	w := httptest.NewRecorder()
+	handleTestRequest(w, request)
+
+	keyBuilder := keybuilder.GetDummyKeyBuilder()
+	key, _ := keyBuilder.Get()
+	savedMessage, _ := dummyKeeper.GetRaw(key)
+	if savedMessage == testMessage {
+		t.Error("Keeper keep raw message")
+	}
+}
