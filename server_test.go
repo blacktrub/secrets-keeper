@@ -126,7 +126,7 @@ func TestOneReader(t *testing.T) {
 
 func TestMessageLengthValidation(t *testing.T) {
 	testMessage := ""
-	for i := 0; i < MESSAGE_MAX_LENGHT+1; i++ {
+	for i := 0; i < MaxLenghtMessage+1; i++ {
 		testMessage += "a"
 	}
 

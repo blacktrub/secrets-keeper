@@ -11,15 +11,15 @@ import (
 	"github.com/gin-gonic/gin"
 )
 
-var MESSAGE_MAX_LENGHT = 1024
-var MAX_TTL = 86400
+const MaxLenghtMessage = 1024
+const MaxTTL = 86400
 
 func validateMessageLenght(msg string) bool {
-	return len(msg) <= MESSAGE_MAX_LENGHT
+	return len(msg) <= MaxLenghtMessage
 }
 
 func validateTTLSize(ttl int) bool {
-	return ttl <= MAX_TTL
+	return ttl <= MaxTTL
 }
 
 func writeInternalError(c *gin.Context) {
@@ -31,7 +31,11 @@ func writeBadRequest(c *gin.Context, reason string) {
 }
 
 func indexView(c *gin.Context) {
-	c.HTML(http.StatusOK, "index.html", nil)
+	c.HTML(
+		http.StatusOK,
+		"index.html",
+		gin.H{"maxTTL": MaxTTL, "maxMessageLenght": MaxLenghtMessage},
+	)
 }
 
 func saveMessageView(c *gin.Context, keyBuilder keybuilder.KeyBuilder, keeper keeper.Keeper) {
