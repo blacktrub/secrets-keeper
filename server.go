@@ -13,13 +13,22 @@ import (
 
 const MaxLenghtMessage = 1024
 const MaxTTL = 86400
+const MinTTL = 60
 
 func validateMessageLenght(msg string) bool {
 	return len(msg) <= MaxLenghtMessage
 }
 
 func validateTTLSize(ttl int) bool {
-	return ttl <= MaxTTL
+	if ttl < MinTTL {
+		return false
+	}
+
+	if ttl >= MaxTTL {
+		return false
+	}
+
+	return true
 }
 
 func writeInternalError(c *gin.Context) {
@@ -47,7 +56,7 @@ func saveMessageView(c *gin.Context, keyBuilder keybuilder.KeyBuilder, keeper ke
 
 	ttl, err := strconv.Atoi(c.PostForm("ttl"))
 	if err != nil {
-		ttl = 0
+		ttl = MinTTL
 	}
 
 	if !validateTTLSize(ttl) {

@@ -98,7 +98,6 @@ func TestOneReader(t *testing.T) {
 	keyBuilder := keybuilder.GetDummyKeyBuilder()
 	key, _ := keyBuilder.Get()
 	dummyKeeper.Set(key, testMessage, 0)
-
 	router := getRouter(keyBuilder, dummyKeeper)
 	resultChannel := make(chan int, 2)
 
@@ -137,6 +136,19 @@ func TestMessageLengthValidation(t *testing.T) {
 	handleTestRequest(w, request)
 	if w.Code != 400 {
 		t.Error("Must be error, because message is too long, but received", w.Code)
+	}
+}
+
+func TestMinTTLValidation(t *testing.T) {
+	for ttl := 0; ttl < MinTTL; ttl++ {
+		postData := strings.NewReader(fmt.Sprintf("message=%s&ttl=%d", "foo", ttl))
+		request, _ := http.NewRequest("POST", "/", postData)
+		request.Header.Set("Content-Type", "application/x-www-form-urlencoded")
+		w := httptest.NewRecorder()
+		handleTestRequest(w, request)
+		if w.Code != 400 {
+			t.Error("Must be error, because ttl is too small, but received", w.Code, "ttl:", ttl)
+		}
 	}
 }
 
