@@ -5,12 +5,22 @@ import (
 	"crypto/cipher"
 	"crypto/rand"
 	"io"
+	"os"
 )
 
-const SecretKey = "supersecretkey11"
+const defaultSecretKey = "supersecretkey11"
+
+
+func getSecretKey() string {
+    envSecret := os.Getenv("SECRET_KEY")
+    if envSecret == "" {
+        return defaultSecretKey
+    }
+    return envSecret
+}
 
 func Encrypt(msg string) (string, error) {
-	c, err := aes.NewCipher([]byte(SecretKey))
+	c, err := aes.NewCipher([]byte(getSecretKey()))
 	if err != nil {
 		return "", err
 	}
@@ -30,7 +40,7 @@ func Encrypt(msg string) (string, error) {
 }
 
 func Decrypt(msg string) (string, error) {
-	c, err := aes.NewCipher([]byte(SecretKey))
+	c, err := aes.NewCipher([]byte(getSecretKey()))
 	if err != nil {
 		return "", err
 	}

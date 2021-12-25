@@ -9,6 +9,8 @@ services:
       - APP_HOST=app
       - STORAGE_HOST=storage
       - GIN_MODE=release
+    env_file: 
+      - secrets.env
   proxy:
     build:
       context: .
