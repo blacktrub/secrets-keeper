@@ -5,6 +5,10 @@ services:
       dockerfile: Dockerfile.server
     links:
       - storage
+    environment:
+      - APP_HOST=app
+      - STORAGE_HOST=storage
+      - GIN_MODE=release
   proxy:
     build:
       context: .

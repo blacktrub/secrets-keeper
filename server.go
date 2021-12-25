@@ -4,6 +4,7 @@ import (
 	"fmt"
 	"log"
 	"net/http"
+	"os"
 	"strconv"
 
 	"secrets-keeper/pkg/keybuilder"
@@ -127,9 +128,17 @@ func getRouter(keyBuilder keybuilder.KeyBuilder, keeper keeper.Keeper) *gin.Engi
 	return router
 }
 
+func getApplicationHost() string {
+	host := os.Getenv("APP_HOST")
+	if host == "" {
+		host = "localhost"
+	}
+	return host
+}
+
 func main() {
 	keyBuilder := keybuilder.UUIDKeyBuilder{}
 	keeper := keeper.GetRedisKeeper()
 	router := getRouter(keyBuilder, keeper)
-	router.Run(":8080")
+	router.Run(fmt.Sprintf("%s:8080", getApplicationHost()))
 }
