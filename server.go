@@ -48,7 +48,11 @@ func indexView(c *gin.Context) {
 	c.HTML(
 		http.StatusOK,
 		"index.html",
-		gin.H{"maxTTL": MaxTTL, "maxMessageLenght": MaxLenghtMessage},
+		gin.H{
+			"maxTTL":           MaxTTL,
+			"minTTL":           MinTTL,
+			"maxMessageLenght": MaxLenghtMessage,
+		},
 	)
 }
 

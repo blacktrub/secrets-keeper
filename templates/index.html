@@ -24,7 +24,7 @@
 		</div>
 		<div>
 			<label for="ttl">TTL:</label><br>
-      <input name="ttl" id="ttl" type="number" min="0" value="0" max={{ .maxTTL }}></input>
+      <input name="ttl" id="ttl" type="number" min="{{ .minTTL }}" value="{{ .minTTL }}" max={{ .maxTTL }}></input>
 		</div>
 		<button type="submit" style="margin-top: 5px;">Save me</button>
 	</form>
