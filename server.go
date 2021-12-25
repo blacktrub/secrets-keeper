@@ -2,6 +2,7 @@ package main
 
 import (
 	"fmt"
+	"log"
 	"net/http"
 	"strconv"
 
@@ -31,6 +32,10 @@ func validateTTLSize(ttl int) bool {
 	return true
 }
 
+func generateLink(c *gin.Context, key string) string {
+	return fmt.Sprintf("http://%s/%s", c.Request.Host, key)
+}
+
 func writeInternalError(c *gin.Context) {
 	c.HTML(http.StatusInternalServerError, "500.html", gin.H{})
 }
@@ -50,6 +55,7 @@ func indexView(c *gin.Context) {
 func saveMessageView(c *gin.Context, keyBuilder keybuilder.KeyBuilder, keeper keeper.Keeper) {
 	message := c.PostForm("message")
 	if !validateMessageLenght(message) {
+		log.Println("Bad message lenght")
 		writeBadRequest(c, "message")
 		return
 	}
@@ -60,22 +66,25 @@ func saveMessageView(c *gin.Context, keyBuilder keybuilder.KeyBuilder, keeper ke
 	}
 
 	if !validateTTLSize(ttl) {
+		log.Println("Bad ttl")
 		writeBadRequest(c, "ttl")
 		return
 	}
 
 	key, err := keyBuilder.Get()
 	if err != nil {
+		log.Println("Keybuilder error", err)
 		writeInternalError(c)
 		return
 	}
 
 	err = keeper.Set(key, message, ttl)
 	if err != nil {
+		log.Println("Keeper error", err)
 		writeInternalError(c)
 		return
 	}
-	c.HTML(http.StatusOK, "key.html", gin.H{"key": fmt.Sprintf("http://%s/%s", c.Request.Host, key)})
+	c.HTML(http.StatusOK, "key.html", gin.H{"key": generateLink(c, key)})
 }
 
 func readMessageView(c *gin.Context, keyBuilder keybuilder.KeyBuilder, keeper keeper.Keeper) {
@@ -118,5 +127,5 @@ func main() {
 	keyBuilder := keybuilder.UUIDKeyBuilder{}
 	keeper := keeper.GetRedisKeeper()
 	router := getRouter(keyBuilder, keeper)
-	router.Run("localhost:8080")
+	router.Run(":8080")
 }

@@ -3,13 +3,13 @@ package keeper
 import (
 	"context"
 	"errors"
+	"fmt"
 	"time"
 
-	"github.com/go-redis/redis/v8"
 	"secrets-keeper/pkg/encrypt"
-)
 
-const TTL = 0
+	"github.com/go-redis/redis/v8"
+)
 
 type RedisKeeper struct {
 	cn  redis.Client
@@ -41,5 +41,9 @@ func (k RedisKeeper) Set(key string, message string, ttl int) error {
 	if err != nil {
 		return err
 	}
-	return k.cn.Set(k.ctx, key, encryptedMessage, time.Duration(ttl)).Err()
+    seconds, err := time.ParseDuration(fmt.Sprintf("%ds", ttl))
+	if err != nil {
+		return err
+	}
+	return k.cn.Set(k.ctx, key, encryptedMessage, seconds).Err()
 }
