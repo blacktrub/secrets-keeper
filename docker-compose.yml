@@ -13,8 +13,8 @@ services:
       - secrets.env
     labels:
       - "traefik.enable=true"
-      - "traefik.http.routers.app.rule=Host(`secretskeeper.xyz`)"
-      - "traefik.http.services.app.loadbalancer.server.port=8888"
+      - "traefik.http.routers.websecure.rule=Host(`secretskeeper.xyz`)"
+      - "traefik.http.services.websecure.loadbalancer.server.port=8888"
       - "traefik.http.routers.websecure.tls=true"
       - "traefik.http.routers.websecure.tls.certresolver=letsencrypt"
   proxy:
