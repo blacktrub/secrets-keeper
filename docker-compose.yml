@@ -13,18 +13,19 @@ services:
       - secrets.env
     labels:
       - "traefik.enable=true"
-      - "traefik.http.routers.websecure.rule=Host(`secretskeeper.xyz`)"
-      - "traefik.http.services.websecure.loadbalancer.server.port=8888"
-      - "traefik.http.routers.websecure.tls=true"
-      - "traefik.http.routers.websecure.tls.certresolver=letsencrypt"
+      - "traefik.http.routers.https.rule=Host(`secretskeeper.xyz`)"
+      - "traefik.http.routers.https.entrypoints=https"
+      - "traefik.http.services.https.loadbalancer.server.port=8888"
+      - "traefik.http.routers.https.tls=true"
+      - "traefik.http.routers.https.tls.certresolver=letsencrypt"
   proxy:
     image: "traefik"
     command:
       - "--api.insecure=true"
       - "--providers.docker=true"
       - "--providers.docker.exposedbydefault=false"
-      - "--entrypoints.web.address=:80"
-      - "--entrypoints.websecure.address=:443"
+      - "--entrypoints.http.address=:80"
+      - "--entrypoints.https.address=:443"
       - "--certificatesresolvers.letsencrypt.acme.httpchallenge=true"
       - "--certificatesresolvers.letsencrypt.acme.httpchallenge.entrypoint=http"
       - "--certificatesresolvers.letsencrypt.acme.email=lightlocdog@gmail.com"
