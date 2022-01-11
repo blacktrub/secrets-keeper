@@ -13,8 +13,10 @@ services:
       - secrets.env
     labels:
       - "traefik.enable=true"
-      - "traefik.http.routers.registry.rule=Host(`secretskeeper.xyz`)"
-      - "traefik.http.services.registry.loadbalancer.server.port=8888"
+      - "traefik.http.routers.app.rule=Host(`secretskeeper.xyz`)"
+      - "traefik.http.services.app.loadbalancer.server.port=8888"
+      - "traefik.http.routers.websecure.tls=true"
+      - "traefik.http.routers.websecure.tls.certresolver=letsencrypt"
   proxy:
     image: "traefik"
     command:
@@ -22,10 +24,17 @@ services:
       - "--providers.docker=true"
       - "--providers.docker.exposedbydefault=false"
       - "--entrypoints.web.address=:80"
+      - "--entrypoints.websecure.address=:443"
+      - "--certificatesresolvers.letsencrypt.acme.httpchallenge=true"
+      - "--certificatesresolvers.letsencrypt.acme.httpchallenge.entrypoint=http"
+      - "--certificatesresolvers.letsencrypt.acme.email=lightlocdog@gmail.com"
+      - "--certificatesresolvers.letsencrypt.acme.storage=/letsencrypt/acme.json"
     ports:
       - "80:80"
+      - "443:443"
     volumes:
       - "/var/run/docker.sock:/var/run/docker.sock:ro"
+      - "./data/letsencrypt:/letsencrypt"
   storage:
     image: redis
 
