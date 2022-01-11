@@ -140,5 +140,5 @@ func main() {
 	keyBuilder := keybuilder.UUIDKeyBuilder{}
 	keeper := keeper.GetRedisKeeper()
 	router := getRouter(keyBuilder, keeper)
-	router.Run(fmt.Sprintf("%s:8080", getApplicationHost()))
+	router.Run(fmt.Sprintf("%s:8888", getApplicationHost()))
 }

@@ -11,14 +11,21 @@ services:
       - GIN_MODE=release
     env_file: 
       - secrets.env
+    labels:
+      - "traefik.enable=true"
+      - "traefik.http.routers.registry.rule=Host(`secretskeeper.xyz`)"
+      - "traefik.http.services.registry.loadbalancer.server.port=8888"
   proxy:
-    build:
-      context: .
-      dockerfile: Dockerfile.proxy
-    links:
-      - app
+    image: "traefik"
+    command:
+      - "--api.insecure=true"
+      - "--providers.docker=true"
+      - "--providers.docker.exposedbydefault=false"
+      - "--entrypoints.web.address=:80"
     ports:
       - "80:80"
+    volumes:
+      - "/var/run/docker.sock:/var/run/docker.sock:ro"
   storage:
     image: redis
 
